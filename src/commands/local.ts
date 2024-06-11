@@ -27,6 +27,7 @@ export function createLocalPackageCommand(): Command {
       for (const name of answers) {
         const result = spawnSync('yalc', ['add', name], { cwd });
         if (result.status !== 0) {
+          console.error(result.stderr.toString());
           throw new Error(`Failed to add package <${name}>`);
         }
 
