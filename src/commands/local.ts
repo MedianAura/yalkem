@@ -25,7 +25,7 @@ export function createLocalPackageCommand(): Command {
       });
 
       for (const name of answers) {
-        const result = spawnSync('yalc', ['add', name], { cwd });
+        const result = spawnSync('yalc', ['add', name], { cwd, windowsVerbatimArguments: true, stdio: 'inherit' });
         if (result.status !== 0) {
           console.error(result.stdout?.toString());
           console.error(result.stderr?.toString());
