@@ -8,57 +8,34 @@ import { Logger } from '../helpers/logger.js';
 export function createLocalPackageCommand(): Command {
   const local = new Command('local');
 
-  local
-    .command('add')
-    .description('add local package.')
-    .action(async () => {
-      Logger.info('Adding local package.');
+  local.description('setup local package.').action(async () => {
+    Logger.info('Setup local package.');
 
-      const cwd = process.cwd();
-      const localPackages = getLocalConfiguration();
-      const listLocalPackages = Object.keys(localPackages);
-      const packages = (getConfiguration().get('packages') ?? []).filter((name) => !listLocalPackages.includes(name));
+    const cwd = process.cwd();
+    const localPackages = getLocalConfiguration();
+    const packages = getConfiguration().get('packages') ?? [];
 
-      const answers = await checkbox({
-        message: 'Select packages to add: ',
-        choices: packages.map((name) => ({ name, value: name })),
-      });
+    const answers = await checkbox({
+      message: 'Select packages to add: ',
+      choices: packages.map((name) => ({ name, value: name, checked: localPackages[name] ?? false })),
+    });
 
-      for (const name of answers) {
-        const result = execaSync('yalc', ['add', name], { cwd, windowsVerbatimArguments: true, stdio: 'inherit' });
-        if (result.code !== 0) {
-          console.error(result);
-          throw new Error(`Failed to add package <${name}>`);
+    for (const packageName in localPackages) {
+      localPackages[packageName] = false;
+
+      if (answers.includes(packageName)) {
+        localPackages[packageName] = true;
+
+        const result = execaSync('yalc', ['add', packageName], { cwd, windowsVerbatimArguments: true, stdio: 'inherit' });
+        if (result.exitCode !== 0) {
+          throw new Error(`Failed to add package <${packageName}>`);
         }
-
-        localPackages[name] = true;
       }
+    }
 
-      updateLocalConfiguration(localPackages);
-      Logger.success('Local package added successfully.');
-    });
-
-  local
-    .command('remove')
-    .description('remove local package.')
-    .action(async () => {
-      Logger.info('Removing local package.');
-
-      const localPackages = getLocalConfiguration();
-
-      const answers = await checkbox({
-        message: 'Select packages to remove: ',
-        choices: Object.keys(localPackages).map((name) => ({ name, value: name })),
-      });
-
-      for (const name of answers) {
-        delete localPackages[name];
-      }
-
-      updateLocalConfiguration(localPackages);
-
-      Logger.success('Local package added successfully.');
-    });
+    updateLocalConfiguration(localPackages);
+    Logger.success('Local package added successfully.');
+  });
 
   return local;
 }

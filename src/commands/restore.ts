@@ -1,4 +1,4 @@
-import { spawnSync } from 'node:child_process';
+import { execaSync } from 'execa';
 import { Command } from '@commander-js/extra-typings';
 import { getLocalConfiguration } from '../helpers/local-configuration.js';
 import { Logger } from '../helpers/logger.js';
@@ -18,8 +18,8 @@ export function createRestoreCommand(): Command {
     }
 
     for (const [name] of activePackages) {
-      const result = spawnSync('yalc', ['add', name], { cwd });
-      if (result.status !== 0) {
+      const result = execaSync('yalc', ['add', name], { cwd });
+      if (result.exitCode !== 0) {
         throw new Error(`Failed to restore package <${name}>`);
       }
     }
