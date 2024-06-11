@@ -1,4 +1,4 @@
-import { spawnSync } from 'node:child_process';
+import { execaSync } from 'execa';
 import { Command } from '@commander-js/extra-typings';
 import { Logger } from '../helpers/logger.js';
 
@@ -10,24 +10,13 @@ export function createPurgeCommand(): Command {
 
     Logger.info('Purging locally installed yalc packages.');
 
-    let result = spawnSync('yalc', ['remove', '--all'], { cwd });
-    if (result.status !== 0) {
+    let result = execaSync('yalc', ['remove', '--all'], { cwd });
+    if (result.code !== 0) {
       throw new Error('Failed to remove all yalc packages.');
     }
 
-    result = spawnSync('rm', ['-rf', '.yalc'], { cwd });
-    if (result.status !== 0) {
-      throw new Error('Failed to remove .yalc directory.');
-    }
-
-    result = spawnSync('rm', ['yalc.lock'], { cwd });
-    if (result.status !== 0) {
-      console.error(result.stderr.toString());
-      throw new Error('Failed to remove yalc.lock file.');
-    }
-
-    result = spawnSync('yalc', ['installations', 'clean'], { cwd });
-    if (result.status !== 0) {
+    result = execaSync('yalc', ['installations', 'clean'], { cwd });
+    if (result.code !== 0) {
       throw new Error('Failed to clean yalc installations.');
     }
 
