@@ -20,6 +20,10 @@ export function createLocalPackageCommand(): Command {
       choices: packages.map((name) => ({ name, value: name, checked: localPackages[name] ?? false })),
     });
 
+    for (const name of answers) {
+      localPackages[name] = true;
+    }
+
     for (const packageName in localPackages) {
       localPackages[packageName] = false;
 
