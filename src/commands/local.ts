@@ -15,8 +15,9 @@ export function createLocalPackageCommand(): Command {
       Logger.info('Adding local package.');
 
       const cwd = process.cwd();
-      const localPackages = Object.keys(getLocalConfiguration());
-      const packages = (getConfiguration().get('packages') ?? []).filter((name) => !localPackages.includes(name));
+      const localPackages = getLocalConfiguration();
+      const listLocalPackages = Object.keys(localPackages);
+      const packages = (getConfiguration().get('packages') ?? []).filter((name) => !listLocalPackages.includes(name));
 
       const answers = await checkbox({
         message: 'Select packages to add: ',
@@ -28,8 +29,11 @@ export function createLocalPackageCommand(): Command {
         if (result.status !== 0) {
           throw new Error(`Failed to add package <${name}>`);
         }
+
+        localPackages[name] = true;
       }
 
+      updateLocalConfiguration(localPackages);
       Logger.success('Local package added successfully.');
     });
 

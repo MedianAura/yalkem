@@ -1,7 +1,9 @@
 import { readPackageSync } from 'read-pkg';
 import { program } from '@commander-js/extra-typings';
-import { createPackageCommand } from './commands/packages.js';
+import { createGlobalPackageCommand } from './commands/global.js';
+import { createLocalPackageCommand } from './commands/local.js';
 import { createPurgeCommand } from './commands/purge.js';
+import { createRestoreCommand } from './commands/restore.js';
 import { handleError } from './helpers/handle-error.js';
 import { Logger } from './helpers/logger.js';
 
@@ -12,8 +14,10 @@ program
   .description(packageJSON.description ?? '')
   .version(packageJSON.version);
 
-program.addCommand(createPackageCommand());
+program.addCommand(createGlobalPackageCommand());
+program.addCommand(createLocalPackageCommand());
 program.addCommand(createPurgeCommand());
+program.addCommand(createRestoreCommand());
 
 export async function run(): Promise<number> {
   Logger.clear();

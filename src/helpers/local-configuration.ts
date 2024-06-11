@@ -1,5 +1,5 @@
-import path from 'node:path';
 import { readFileSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
 
 const localConfigurationPath = path.resolve(process.cwd(), '.yalkemrc');
 
