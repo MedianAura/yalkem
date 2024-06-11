@@ -1,15 +1,15 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { Command } from '@commander-js/extra-typings';
-import { __os_appdata_path } from '@spongex/os-appdata-path';
 import { checkbox } from '@inquirer/prompts';
+import { __os_appdata_path } from '@spongex/os-appdata-path';
 import { getConfiguration } from '../helpers/config.js';
 import { Logger } from '../helpers/logger.js';
 
-export function createPackageCommand(): Command {
-  const packages = new Command('packages');
+export function createGlobalPackageCommand(): Command {
+  const globalPackages = new Command('global');
 
-  packages
+  globalPackages
     .command('list', { isDefault: true })
     .description('list yalkem available packages.')
     .action(() => {
@@ -27,7 +27,7 @@ export function createPackageCommand(): Command {
       }
     });
 
-  packages
+  globalPackages
     .command('add')
     .description('add package to yalkem.')
     .argument('<name>', 'name of the yalc package to add.')
@@ -51,14 +51,14 @@ export function createPackageCommand(): Command {
       Logger.success('Package added successfully.');
     });
 
-  packages
+  globalPackages
     .command('remove')
     .description('remove package from yalkem.')
     .action(async () => {
       const packages = getConfiguration().get('packages') ?? [];
 
       const answers = await checkbox({
-        message: 'Select a package manager',
+        message: 'Select a package to remove: ',
         choices: packages.map((name) => ({ name, value: name })),
       });
 
@@ -75,5 +75,5 @@ export function createPackageCommand(): Command {
       Logger.success('Package removed successfully.');
     });
 
-  return packages;
+  return globalPackages;
 }

@@ -1,79 +1,59 @@
-import { existsSync } from 'node:fs';
-import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { Command } from '@commander-js/extra-typings';
-import { __os_appdata_path } from '@spongex/os-appdata-path';
 import { checkbox } from '@inquirer/prompts';
 import { getConfiguration } from '../helpers/config.js';
+import { getLocalConfiguration, updateLocalConfiguration } from '../helpers/local-configuration.js';
 import { Logger } from '../helpers/logger.js';
 
-export function createPackageCommand(): Command {
-  const packages = new Command('packages');
+export function createLocalPackageCommand(): Command {
+  const local = new Command('local');
 
-  packages
-    .command('list', { isDefault: true })
-    .description('list yalkem available packages.')
-    .action(() => {
-      Logger.info('List Packages : ');
-      Logger.println('============================');
-
-      const packages = getConfiguration().get('packages');
-
-      if (packages?.length > 0) {
-        for (const pack of getConfiguration().get('packages')) {
-          Logger.print(`- ${pack}`);
-        }
-      } else {
-        Logger.warn('No managed packages.');
-      }
-    });
-
-  packages
+  local
     .command('add')
-    .description('add package to yalkem.')
-    .argument('<name>', 'name of the yalc package to add.')
-    .action((name) => {
-      const libraryPath = path.join(__os_appdata_path ?? '', 'Yalc/packages', name);
-
-      if (!existsSync(libraryPath)) {
-        throw new Error(`Directory <${libraryPath}> not found. Make sure to yalc publish the package first.`);
-      }
-
-      const packages = getConfiguration().get('packages') ?? [];
-      const index = packages.indexOf(name);
-
-      if (index !== -1) {
-        throw new Error('Package already added.');
-      }
-
-      packages.push(name);
-      getConfiguration().set('packages', packages);
-
-      Logger.success('Package added successfully.');
-    });
-
-  packages
-    .command('remove')
-    .description('remove package from yalkem.')
+    .description('add local package.')
     .action(async () => {
-      const packages = getConfiguration().get('packages') ?? [];
+      Logger.info('Adding local package.');
+
+      const cwd = process.cwd();
+      const localPackages = Object.keys(getLocalConfiguration());
+      const packages = (getConfiguration().get('packages') ?? []).filter((name) => !localPackages.includes(name));
 
       const answers = await checkbox({
-        message: 'Select a package manager',
+        message: 'Select packages to add: ',
         choices: packages.map((name) => ({ name, value: name })),
       });
 
-      if (answers.length === 0) {
-        throw new Error('No package selected.');
-      }
-
       for (const name of answers) {
-        packages.splice(packages.indexOf(name), 1);
+        const result = spawnSync('yalc', ['add', name], { cwd });
+        if (result.status !== 0) {
+          throw new Error(`Failed to add package <${name}>`);
+        }
       }
 
-      getConfiguration().set('packages', packages);
-
-      Logger.success('Package removed successfully.');
+      Logger.success('Local package added successfully.');
     });
 
-  return packages;
+  local
+    .command('remove')
+    .description('remove local package.')
+    .action(async () => {
+      Logger.info('Removing local package.');
+
+      const localPackages = getLocalConfiguration();
+
+      const answers = await checkbox({
+        message: 'Select packages to remove: ',
+        choices: Object.keys(localPackages).map((name) => ({ name, value: name })),
+      });
+
+      for (const name of answers) {
+        delete localPackages[name];
+      }
+
+      updateLocalConfiguration(localPackages);
+
+      Logger.success('Local package added successfully.');
+    });
+
+  return local;
 }
