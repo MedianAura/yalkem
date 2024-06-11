@@ -1,9 +1,8 @@
 import { readPackageSync } from 'read-pkg';
 import { program } from '@commander-js/extra-typings';
-import { BranchRunner } from './controllers/branch-runner.js';
-import { CommitRunner } from './controllers/commit-runner.js';
 import { handleError } from './helpers/handle-error.js';
 import { Logger } from './helpers/logger.js';
+import { createPackageCommand } from './commands/packages.js';
 
 const packageJSON = readPackageSync();
 
@@ -12,37 +11,23 @@ program
   .description(packageJSON.description ?? '')
   .version(packageJSON.version);
 
-program.command('commit', { isDefault: true }).action(async () => {
-  await new CommitRunner().run();
-});
+program.addCommand(createPackageCommand());
 
-program.command('generate').action(async () => {
-  await new CommitRunner().run();
-});
+program.command('install');
 
-program.command('validate').action(async () => {
-  await new CommitRunner().run();
-});
+program.command('remove');
 
-program
-  .command('branch')
-  .argument('<branch>', 'branch to create')
-  .action(async (branch) => {
-    await new BranchRunner().run(branch);
-  });
+program.command('purge');
 
-program.command('staging').action(async () => {
-  await new CommitRunner().run();
-});
+program.command('restore');
 
 export async function run(): Promise<number> {
   Logger.clear();
+  Logger.title('Yalkem CLI - Yalc Package Manager');
 
   try {
     await program.parseAsync();
   } catch (error: unknown) {
-    Logger.skipLine();
-
     return handleError(error);
   }
 
