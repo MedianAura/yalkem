@@ -1,4 +1,4 @@
-import { spawnSync } from 'node:child_process';
+import { execaSync } from 'execa';
 import { Command } from '@commander-js/extra-typings';
 import { checkbox } from '@inquirer/prompts';
 import { getConfiguration } from '../helpers/config.js';
@@ -25,10 +25,9 @@ export function createLocalPackageCommand(): Command {
       });
 
       for (const name of answers) {
-        const result = spawnSync('yalc', ['add', name], { cwd, windowsVerbatimArguments: true, stdio: 'inherit' });
-        if (result.status !== 0) {
-          console.error(result.stdout?.toString());
-          console.error(result.stderr?.toString());
+        const result = execaSync('yalc', ['add', name], { cwd, windowsVerbatimArguments: true, stdio: 'inherit' });
+        if (result.code !== 0) {
+          console.error(result);
           throw new Error(`Failed to add package <${name}>`);
         }
 
