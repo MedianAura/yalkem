@@ -1,12 +1,12 @@
 import chalk from 'chalk';
 import { createLogUpdate } from 'log-update';
 
-function print(message: string): void {
-  const log = createLogUpdate(process.stdout, {
-    showCursor: true,
-  });
+const log = createLogUpdate(process.stdout, {
+  showCursor: true,
+});
 
-  log(message);
+function print(message: string): void {
+  log(chalk.reset() + message);
   log.done();
 }
 

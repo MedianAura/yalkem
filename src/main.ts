@@ -3,6 +3,7 @@ import { program } from '@commander-js/extra-typings';
 import { handleError } from './helpers/handle-error.js';
 import { Logger } from './helpers/logger.js';
 import { createPackageCommand } from './commands/packages.js';
+import { createPurgeCommand } from './commands/purge.js';
 
 const packageJSON = readPackageSync();
 
@@ -12,14 +13,7 @@ program
   .version(packageJSON.version);
 
 program.addCommand(createPackageCommand());
-
-program.command('install');
-
-program.command('remove');
-
-program.command('purge');
-
-program.command('restore');
+program.addCommand(createPurgeCommand());
 
 export async function run(): Promise<number> {
   Logger.clear();
