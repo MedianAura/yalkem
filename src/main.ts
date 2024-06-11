@@ -1,9 +1,9 @@
 import { readPackageSync } from 'read-pkg';
 import { program } from '@commander-js/extra-typings';
-import { handleError } from './helpers/handle-error.js';
-import { Logger } from './helpers/logger.js';
 import { createPackageCommand } from './commands/packages.js';
 import { createPurgeCommand } from './commands/purge.js';
+import { handleError } from './helpers/handle-error.js';
+import { Logger } from './helpers/logger.js';
 
 const packageJSON = readPackageSync();
 

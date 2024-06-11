@@ -4,11 +4,8 @@ export function createRestoreCommand(): Command {
   const restore = new Command('restore');
 
   restore
-    .command('list', { isDefault: true })
     .description('list yalkem available packages.')
-    .action(() => {
-
-    });
+    .action(() => {});
 
   return restore;
 }
