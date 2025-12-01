@@ -1,6 +1,6 @@
-import z from 'zod';
+import { z } from 'zod';
 
-const ConfigurationModel = z
+export const ConfigurationModel = z
   .object({
     packages: z.array(z.string()).default([]),
   })

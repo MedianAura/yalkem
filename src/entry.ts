@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 
-import dotenvFlow from 'dotenv-flow';
-dotenvFlow.config();
+import { config } from 'dotenv-flow';
+config();
 
 export async function run(): Promise<number> {
   const program = await import('./main.js');
