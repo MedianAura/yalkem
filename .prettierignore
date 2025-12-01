@@ -1,6 +1,8 @@
 out
 dist
-package-lock.json
+.claude
+src/typings/auto-imports.d.ts
 LICENSE.md
 tsconfig.json
 tsconfig.*.json
+pnpm-*.yaml
