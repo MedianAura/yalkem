@@ -24,7 +24,7 @@
     "start": "cross-env NODE_ENV=development node ./bin/run.js",
     "test:coverage": "open-cli coverage/lcov-report/index.html",
     "test:unit": "vitest --coverage.enabled --coverage.all --coverage.reporter=lcov",
-    "test:unit:coverage": "vitest --reporter basic --reporter junit --outputFile.junit=junit.xml --coverage.enabled --coverage.reporter=text-summary --coverage.reporter=cobertura --coverage.reporter=lcov --watch=false",
+    "test:unit:coverage": "vitest --reporter=default --coverage.enabled --coverage.reporter=text-summary --coverage.reporter=lcov --watch=false",
     "watch": "shx rm -rf dist && tsc -p tsconfig.build.json --watch"
   },
   "dependencies": {
